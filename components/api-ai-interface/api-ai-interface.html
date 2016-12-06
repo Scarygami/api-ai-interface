@@ -1,0 +1,94 @@
+<link rel="import" href="../polymer/polymer.html">
+
+<link rel="import" href="api-ai-api.html">
+<link rel="import" href="api-ai-input.html">
+<link rel="import" href="api-ai-icons.html">
+
+<!--
+`api-ai-interface`
+Polymer elements to interact with API.AI Agents
+
+@demo demo/index.html
+-->
+
+<dom-module id="api-ai-interface">
+  <template>
+    <style>
+      :host {
+        display: block;
+      }
+
+      #input {
+        @apply --layout-horizontal;
+        @apply --layout-end;
+      }
+    </style>
+
+    <api-ai-api id="api"
+                access-token="[[accessToken]]"
+                lang="[[lang]]"
+                session-id="[[_sessionId]]"
+                message="{{_message}}"
+                last-response="{{_response}}"
+                on-response="_handleResponse"
+    ></api-ai-api>
+
+
+    <api-ai-input lang="[[lang]]"
+                  value="{{_message}}"
+                  on-value-ready="_send"
+    ></api-ai-input>
+
+    <template is="dom-repeat" items="[[_conversation]]">
+      <span>[[item.who]]:</span> <b>[[item.message]]</b><br>
+    </template>
+  </template>
+
+  <script>
+    Polymer({
+      is: 'api-ai-interface',
+
+      properties: {
+        accessToken: String,
+        lang: {
+          type: String,
+          value: 'en'
+        },
+        _sessionId: String,
+        _message: String,
+        _response: Object,
+        _conversation: {
+          type: Array,
+          value: function () {
+            return [];
+          }
+        }
+      },
+
+      ready: function () {
+        this._sessionId = Math.random().toString(36).replace(/[^a-z]+/g, '');
+      },
+
+      _send: function () {
+        if (!this._message) {
+          return;
+        }
+        this.unshift('_conversation', {
+          in: false,
+          who: 'You',
+          message: this._message
+        });
+        this.$.api.send();
+        this.set('_message', '');
+      },
+
+      _handleResponse: function () {
+        this.unshift('_conversation', {
+          in: true,
+          who: 'API.AI',
+          message: this._response.result.fulfillment.speech
+        });
+      }
+    });
+  </script>
+</dom-module>

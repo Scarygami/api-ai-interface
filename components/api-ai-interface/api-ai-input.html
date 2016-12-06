@@ -1,0 +1,178 @@
+<link rel="import" href="../polymer/polymer.html">
+
+<link rel="import" href="../paper-input/paper-input-container.html">
+<link rel="import" href="../paper-icon-button/paper-icon-button.html">
+<link rel="import" href="../iron-input/iron-input.html">
+<link rel="import" href="api-ai-icons.html">
+
+<!--
+`api-ai-input`
+
+Voice enabled input element
+ -->
+
+<dom-module id="api-ai-input">
+  <template>
+    <style>
+      :host {
+        display: block;
+      }
+
+      [hidden] {
+        display: none !important;
+      }
+
+    </style>
+
+    <paper-input-container>
+      <label>[[label]]</label>
+      <input is="iron-input" bind-value="{{value}}" on-keydown="_checkForEnter">
+      <paper-icon-button suffix
+                         icon="api-ai:mic"
+                         hidden$="[[!_micAvailable(noVoice, _speechRecognition, _recording)]]"
+                         on-tap="_startRecognition"
+      ></paper-icon-button>
+      <paper-icon-button suffix
+                         icon="api-ai:mic-off"
+                         hidden$="[[!_recording]]"
+                         on-tap="_stopRecognition"
+      ></paper-icon-button>
+      <paper-icon-button suffix icon="api-ai:send" on-tap="_submit"></paper-icon-button>
+    </paper-input-container>
+  </template>
+
+  <script>
+    Polymer({
+      is: 'api-ai-input',
+
+      properties: {
+        /*
+         * Label of the input element
+         */
+        label: {
+          type: String,
+          value: 'Message to API.AI Agent'
+        },
+
+        /*
+         * Current content of the input element for two-way binding
+         */
+        value: {
+          type: String,
+          notify: true
+        },
+
+        /*
+         * Disable speech-recognition for the element
+         */
+        noVoice: {
+          type: Boolean,
+          value: false
+        },
+
+        /*
+         * Language code for speech recognition. Should match the API.AI agent's language
+         */
+        lang: {
+          type: String,
+          value: 'en'
+        },
+
+        /*
+         * true = browser supports speech recognition with the Web Speech API
+         */
+        _speechRecognition: {
+          type: Boolean,
+          value: function () {
+            return (!!window.SpeechRecognition || !!window.webkitSpeechRecognition);
+          }
+        },
+
+        /*
+         * true = Speech recogntion is currently running
+         */
+        _recording: {
+          type: Boolean,
+          value: false
+        }
+      },
+
+      /*
+       *  Whether to show Microphone icon or not
+       */
+      _micAvailable: function (noVoice, speechRecognition, recording) {
+        return (!noVoice && speechRecognition && !recording);
+      },
+
+      /*
+       * Start speech recognition
+       */
+      _startRecognition: function () {
+        var SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        this._recognition = new SpeechRecognition();
+
+        this._recognition.onstart = function () {
+          this.set('value', '');
+          this.set('_recording', true);
+        }.bind(this);
+
+        this._recognition.onresult = function(event) {
+          var text = '';
+          for (var i = event.resultIndex; i < event.results.length; ++i) {
+            text += event.results[i][0].transcript;
+          }
+          this.set('value', text);
+          this._stopRecognition();
+        }.bind(this);
+
+        this._recognition.onend = function() {
+          this._finishRecognition();
+        }.bind(this);
+
+        this._recognition.lang = this.lang;
+        this._recognition.start();
+      },
+
+      /*
+       * Fires when a value is ready to be sent
+       *
+       * @event value-ready
+       */
+
+      /*
+       * Stop speech recognition
+       */
+      _stopRecognition: function () {
+        if (this._recognition) {
+          this._recognition.stop();
+        }
+      },
+
+      /*
+       * Clean-up after speech recognition
+       */
+      _finishRecognition: function () {
+        this._recognition = null;
+        this.set('_recording', false);
+        this._submit();
+      },
+
+      _checkForEnter: function (e) {
+        if (e.keyCode === 13) {
+          this._submit();
+        }
+      },
+
+      /*
+       * Send message
+       */
+      _submit: function () {
+        if (this.value) {
+          this.fire('value-ready', {
+            value: this.value
+          });
+        }
+      }
+    });
+  </script>
+</dom-module>

@@ -1,0 +1,40 @@
+{
+  "name": "api-ai-interface",
+  "version": "0.0.1",
+  "homepage": "https://github.com/Scarygami/api-ai-interface.html",
+  "authors": [
+    "Gerwin Sturm <scarygami@gmail.com>"
+  ],
+  "description": "Polymer elements to interact with API.AI Agents",
+  "main": "api-ai-interface.html",
+  "keywords": [
+    "Polymer",
+    "ai",
+    "api.ai",
+    "web-components",
+    "web-component"
+  ],
+  "license": "Apache 2.0",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "polymer": "Polymer/polymer#^1.0.0",
+    "iron-ajax": "PolymerElements/iron-ajax#^1.0.0",
+    "paper-input": "PolymerElements/paper-input#^1.0.0",
+    "iron-flex-layout": "PolymerElements/iron-flex-layout#^1.0.0",
+    "paper-icon-button": "PolymerElements/paper-icon-button#^1.0.0",
+    "iron-icon": "PolymerElements/iron-icon#^1.0.0",
+    "iron-iconset-svg": "PolymerElements/iron-iconset-svg#^1.0.0"
+  },
+  "devDependencies": {
+    "iron-component-page": "PolymerElements/iron-component-page#^1.0.0",
+    "iron-demo-helpers": "PolymerElements/iron-demo-helpers#^1.0.0",
+    "web-component-tester": "^4.0.0",
+    "webcomponentsjs": "webcomponents/webcomponentsjs#^0.7.0"
+  }
+}
