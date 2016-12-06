@@ -26,7 +26,7 @@ Voice enabled input element
 
     <paper-input-container>
       <label>[[label]]</label>
-      <input is="iron-input" bind-value="{{value}}">
+      <input is="iron-input" bind-value="{{value}}" on-keydown="_checkForEnter">
       <paper-icon-button suffix
                          icon="api-ai:mic"
                          hidden$="[[!_micAvailable(noVoice, _speechRecognition, _recording)]]"
@@ -155,6 +155,12 @@ Voice enabled input element
         this._recognition = null;
         this.set('_recording', false);
         this._submit();
+      },
+
+      _checkForEnter: function (e) {
+        if (e.keyCode === 13) {
+          this._submit();
+        }
       },
 
       /*

@@ -8,7 +8,7 @@
 `api-ai-interface`
 Polymer elements to interact with API.AI Agents
 
-@demo demo/index.html 
+@demo demo/index.html
 -->
 
 <dom-module id="api-ai-interface">
@@ -38,6 +38,10 @@ Polymer elements to interact with API.AI Agents
                   value="{{_message}}"
                   on-value-ready="_send"
     ></api-ai-input>
+
+    <template is="dom-repeat" items="[[_conversation]]">
+      <span>[[item.who]]:</span> <b>[[item.message]]</b><br>
+    </template>
   </template>
 
   <script>
@@ -52,7 +56,13 @@ Polymer elements to interact with API.AI Agents
         },
         _sessionId: String,
         _message: String,
-        _response: Object
+        _response: Object,
+        _conversation: {
+          type: Array,
+          value: function () {
+            return [];
+          }
+        }
       },
 
       ready: function () {
@@ -63,12 +73,21 @@ Polymer elements to interact with API.AI Agents
         if (!this._message) {
           return;
         }
+        this.unshift('_conversation', {
+          in: false,
+          who: 'You',
+          message: this._message
+        });
         this.$.api.send();
+        this.set('_message', '');
       },
 
-      _handleResponse: function (e) {
-        console.log(e);
-        console.log(this._response);
+      _handleResponse: function () {
+        this.unshift('_conversation', {
+          in: true,
+          who: 'API.AI',
+          message: this._response.result.fulfillment.speech
+        });
       }
     });
   </script>
