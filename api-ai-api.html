@@ -15,6 +15,17 @@ Polymer elements to interact with API.AI Agents
         display: none;
       }
     </style>
+
+    <iron-ajax id="request"
+               url="https://api.api.ai/v1/query?v=20150910"
+               headers="[[_computeHeaders(accessToken)]]"
+               body="[[_computeBody(message, sessionId, lang)]]"
+               handle-as="json"
+               content-type="application/json"
+               method="POST"
+               last-response="{{lastResponse}}"
+               on-response="_handleResponse"
+    ></iron-ajax>
   </template>
 
   <script>
@@ -22,7 +33,40 @@ Polymer elements to interact with API.AI Agents
       is: 'api-ai-api',
 
       properties: {
+        accessToken: String,
+        message: String,
+        sessionId: String,
+        lang: {
+          type: String,
+          value: 'en'
+        },
 
+        lastResponse: {
+          type: Object,
+          notify: true
+        }
+      },
+
+      _computeHeaders: function (accessToken) {
+        return {
+          Authorization: 'Bearer ' + accessToken
+        }
+      },
+
+      _computeBody: function (message, sessionId, lang) {
+        return {
+          query: message,
+          lang: lang,
+          sessionId: sessionId
+        };
+      },
+
+      send: function () {
+        this.$.request.generateRequest();
+      },
+
+      _handleResponse: function () {
+        this.fire('response', this.lastResponse);
       }
     });
   </script>

@@ -37,6 +37,7 @@ Voice enabled input element
                          hidden$="[[!_recording]]"
                          on-tap="_stopRecognition"
       ></paper-icon-button>
+      <paper-icon-button suffix icon="api-ai:send" on-tap="_submit"></paper-icon-button>
     </paper-input-container>
   </template>
 
@@ -104,12 +105,6 @@ Voice enabled input element
       },
 
       /*
-       * Fires when speech recognition completed successfully
-       *
-       * @event recognition-end
-       */
-
-      /*
        * Start speech recognition
        */
       _startRecognition: function () {
@@ -127,12 +122,11 @@ Voice enabled input element
             text += event.results[i][0].transcript;
           }
           this.set('value', text);
-          this.set('_recording', false);
           this._stopRecognition();
         }.bind(this);
 
         this._recognition.onend = function() {
-          this._stopRecognition();
+          this._finishRecognition();
         }.bind(this);
 
         this._recognition.lang = this.lang;
@@ -140,16 +134,35 @@ Voice enabled input element
       },
 
       /*
+       * Fires when a value is ready to be sent
+       *
+       * @event value-ready
+       */
+
+      /*
        * Stop speech recognition
        */
       _stopRecognition: function () {
         if (this._recognition) {
           this._recognition.stop();
-          this._recognition = null;
         }
+      },
+
+      /*
+       * Clean-up after speech recognition
+       */
+      _finishRecognition: function () {
+        this._recognition = null;
         this.set('_recording', false);
+        this._submit();
+      },
+
+      /*
+       * Send message
+       */
+      _submit: function () {
         if (this.value) {
-          this.fire('recognition-end', {
+          this.fire('value-ready', {
             value: this.value
           });
         }

@@ -17,9 +17,27 @@ Polymer elements to interact with API.AI Agents
       :host {
         display: block;
       }
+
+      #input {
+        @apply --layout-horizontal;
+        @apply --layout-end;
+      }
     </style>
 
-    <api-ai-input></api-ai-input>
+    <api-ai-api id="api"
+                access-token="[[accessToken]]"
+                lang="[[lang]]"
+                session-id="[[_sessionId]]"
+                message="{{_message}}"
+                last-response="{{_response}}"
+                on-response="_handleResponse"
+    ></api-ai-api>
+
+
+    <api-ai-input lang="[[lang]]"
+                  value="{{_message}}"
+                  on-value-ready="_send"
+    ></api-ai-input>
   </template>
 
   <script>
@@ -27,7 +45,30 @@ Polymer elements to interact with API.AI Agents
       is: 'api-ai-interface',
 
       properties: {
+        accessToken: String,
+        lang: {
+          type: String,
+          value: 'en'
+        },
+        _sessionId: String,
+        _message: String,
+        _response: Object
+      },
 
+      ready: function () {
+        this._sessionId = Math.random().toString(36).replace(/[^a-z]+/g, '');
+      },
+
+      _send: function () {
+        if (!this._message) {
+          return;
+        }
+        this.$.api.send();
+      },
+
+      _handleResponse: function (e) {
+        console.log(e);
+        console.log(this._response);
       }
     });
   </script>
