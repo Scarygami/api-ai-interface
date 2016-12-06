@@ -1,2 +1,3 @@
-# api-ai-interface
-Polymer elements to interact with API.AI agents.
+# \<api-ai-interface\>
+
+Polymer elements to interact with API.AI Agents
